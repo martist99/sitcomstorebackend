@@ -24,6 +24,7 @@ def hello_world(request):
 class CustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request: Request, *args, **kwargs) -> Response:
         response = super().post(request, *args, **kwargs)
+        
         access_token = response.data["access"]
         response.data.pop("access")
         response.set_cookie(
@@ -55,7 +56,14 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
 
         )
+        user=User.objects.filter(email=request.data.get('email')).first()
+        response.data=UserSerializer(user).data
+        print(response.cookies,"popopo")
+        
         return response
+
+
+
 
 class CookieTokenRefreshSerializer(TokenRefreshSerializer):
     refresh = None
@@ -72,6 +80,7 @@ class CookieTokenRefreshView(TokenRefreshView):
     serializer_class = CookieTokenRefreshSerializer
 
     def finalize_response(self, request, response, *args, **kwargs):
+        
         if response.data.get("refresh"):
             response.set_cookie(
                 key=settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'],

@@ -64,7 +64,6 @@ class WatchLaterDeleteAPIView(generics.DestroyAPIView):
     def destroy(self, request, *args, **kwargs):
         user = self.request.user
         video_id = self.kwargs['video_id']
-        print(user,video_id)
         watch_later = get_object_or_404(WatchLater, user=user, video=video_id)
 
         # Check if the requesting user is the owner of the WatchLater object
@@ -113,7 +112,6 @@ class LikedDeleteAPIView(generics.DestroyAPIView):
     def destroy(self, request, *args, **kwargs):
         user = self.request.user
         video_id = self.kwargs['video_id']
-        print(user,video_id)
         liked = get_object_or_404(LikedVideo, user=user, video=video_id)
 
         # Check if the requesting user is the owner of the WatchLater object
@@ -163,7 +161,6 @@ class HistoryDeleteAPIView(generics.DestroyAPIView):
     def destroy(self, request, *args, **kwargs):
         user = self.request.user
         video_id = self.kwargs['video_id']
-        print(user,video_id)
         history = get_object_or_404(History, user=user, video=video_id)
 
         # Check if the requesting user is the owner of the WatchLater object
@@ -289,7 +286,7 @@ def remove_video_from_playlist(request, playlist_id, video_id):
     playlist.videos.remove(video_id)
     playlist.save()
 
-    serializer = PlaylistSerializer(playlist)
+    serializer = Playlist(playlist)
     return Response({"detail":"successfully deleted"}, status=status.HTTP_200_OK)
 
 
