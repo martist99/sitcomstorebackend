@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Video,WatchLater,LikedVideo,History,Playlist
+from .models import Video,WatchLater,LikedVideo,History,Playlist,Comment
 class VideoSerializer(serializers.ModelSerializer):
     class Meta:
         model=Video
@@ -26,3 +26,9 @@ class PlaylistSerializer(serializers.ModelSerializer):
         model=Playlist
         fields = ['id', 'user', 'title', 'videos', 'created_at']
         read_only_fields = ['user', 'created_at']
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['id', 'user', 'video', 'text', 'created_at', 'parent_comment']

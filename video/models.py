@@ -21,7 +21,7 @@ class WatchLater(models.Model):
     video = models.ForeignKey(Video, on_delete=models.CASCADE)
     added_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    def __str__(self):      
         return f"{self.user.email} - {self.video.title} (Watch Later)"
 
 class LikedVideo(models.Model):
@@ -48,3 +48,14 @@ class Playlist(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - {self.title} (Playlist)"
+    
+
+class Comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    video = models.ForeignKey(Video, on_delete=models.CASCADE, related_name='comments')
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    parent_comment = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
+
+    def __str__(self):
+        return f"{self.user.email} - {self.video.title} - Comment: {self.text[:50]}"

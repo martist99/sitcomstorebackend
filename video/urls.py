@@ -7,9 +7,9 @@ urlpatterns = [
     path('',views.VideoListView.as_view(),name='videolist-view'),
     path('<int:pk>/',views.VideoView.as_view(),name='video-view'),
     
-    path('watch-later/', views.WatchLaterListByUserAPIView.as_view(), name='watch-later-list'),
-    path('watch-later/create/', views.WatchLaterCreateAPIView.as_view(), name='watch-later-create'),
-    path('watch-later/remove/<int:video_id>/', views.WatchLaterDeleteAPIView.as_view(), name='watch-later-remove'),
+    path('watchlater/', views.WatchLaterListByUserAPIView.as_view(), name='watch-later-list'),
+    path('watchlater/create/', views.WatchLaterCreateAPIView.as_view(), name='watch-later-create'),
+    path('watchlater/remove/<int:video_id>/', views.WatchLaterDeleteAPIView.as_view(), name='watch-later-remove'),
 
     path('liked/', views.LikedListByUserAPIView.as_view(), name='liked-list'),
     path('liked/create/', views.LikedCreateAPIView.as_view(), name='liked-create'),
@@ -28,5 +28,7 @@ urlpatterns = [
     path('playlist/<int:playlist_id>/remove/<int:video_id>/', views.remove_video_from_playlist, name='remove-video-from-playlist'),
     path('playlist/check/<int:video_id>/', views.video_presence_in_playlists, name='video-presence-in-playlists'),
 
+    path('liked/check/<int:video_id>/', views.is_video_liked, name='video-presence-in-like'),
+    path('watchlater/check/<int:video_id>/', views.is_video_in_watch_later, name='video-presence-in-watchlater'),
 
 ]

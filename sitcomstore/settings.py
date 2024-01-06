@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-fd+2i!%i)t&u@4jo=(6&cdddvrmc*ol#2yy%&it_1*&7*&h47*'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -42,9 +42,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
-
     'corsheaders',
-
+    'django_filters',
 
 ]
 
@@ -142,23 +141,24 @@ CORS_ALLOWED_ORIGINS = [
 
 CORS_ALLOW_CREDENTIALS = True
 
-# CSRF_COOKIE_SECURE = True
-# CSRF_COOKIE_HTTP_ONLY = True
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173"
 ]
 CORS_EXPOSE_HEADERS = ["Content-Type", "X-CSRFToken"]
 SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SAMESITE = "None"
-SESSION_COOKIE_SAMESITE = "None"
-SESSION_COOKIE_DOMAIN="None"
+CSRF_COOKIE_SAMESITE = 'lax'
+SESSION_COOKIE_SAMESITE = 'lax'
+# SESSION_COOKIE_DOMAIN=None
 CSRF_COOKIE_PATH = '/'
 CSRF_COOKIE_SECURE = True 
+SESSION_COOKIE_PATH = '/;HttpOnly'
+CSRF_COOKIE_HTTPONLY=True
+SESSION_COOKIE_HTTPONLY = True
 
 from datetime  import timedelta
 
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=1),
+SIMPLE_JWT = {  
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=10),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
@@ -186,10 +186,9 @@ SIMPLE_JWT = {
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'account.authenticate.CustomAuthentication'
+        # 'account.authenticate.CustomAuthentication'
     ],
-    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    # 'PAGE_SIZE': 100
+
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 
 }

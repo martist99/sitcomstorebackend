@@ -1,11 +1,14 @@
 from django.shortcuts import render
-from rest_framework.decorators import api_view,permission_classes
+from rest_framework.decorators import api_view,permission_classes,authentication_classes
 from rest_framework.response import Response
 from rest_framework import generics,status
-from .models import CATEGORY_CHOICES,Video,WatchLater,LikedVideo,History,Playlist
-from .serializers import PlaylistSerializer,VideoSerializer,WatchLaterSerializer,HistorySerializer,LikedVideoSerializer
-from rest_framework.permissions import IsAuthenticated,IsAuthenticatedOrReadOnly
+from .models import CATEGORY_CHOICES,Video,WatchLater,LikedVideo,History,Playlist,Comment
+from .serializers import PlaylistSerializer,VideoSerializer,WatchLaterSerializer,HistorySerializer,LikedVideoSerializer,CommentSerializer
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
+from account.authenticate import CustomAuthentication
 
 # Create your views here.
 
@@ -16,19 +19,21 @@ def category_choices(request):
     category_choices = [value for value,_  in CATEGORY_CHOICES]
     return Response({'categories': category_choices})
 
-class VideoListView(generics.ListAPIView,generics.CreateAPIView):
+class VideoListView(generics.ListAPIView):
     queryset = Video.objects.all()
     serializer_class = VideoSerializer
-    permission_classes=[IsAuthenticatedOrReadOnly]
-    
-class VideoView(generics.RetrieveUpdateDestroyAPIView):
+    filter_backends = [DjangoFilterBackend,filters.SearchFilter]
+    filterset_fields = ['category']
+    search_fields = ['category', 'creator','title']
+
+class VideoView(generics.RetrieveAPIView):
     serializer_class = VideoSerializer
     queryset=Video.objects.all()
-    permission_classes=[IsAuthenticatedOrReadOnly]
-    
+        
 class WatchLaterListByUserAPIView(generics.ListAPIView):
     serializer_class = VideoSerializer
     permission_classes = [IsAuthenticated]
+    authentication_classes=([CustomAuthentication])
 
     def get_queryset(self):
         user = self.request.user
@@ -44,12 +49,13 @@ class WatchLaterListByUserAPIView(generics.ListAPIView):
 class WatchLaterCreateAPIView(generics.CreateAPIView):
     serializer_class = WatchLaterSerializer
     permission_classes = [IsAuthenticated]  # Add appropriate permissions
+    authentication_classes=([CustomAuthentication])
 
     def perform_create(self, serializer):
         
         request_user = self.request.user
         if 'user' in serializer.validated_data and serializer.validated_data['user'] != request_user:
-            raise ValidationError({"error":"Not AUthenticated user"},code=401)
+            raise ValidationError({"error":"Not Authenticated user"},code=401)
         video_id = serializer.validated_data.get('video', None)  
         if video_id is not None and WatchLater.objects.filter(user=request_user, video=video_id).exists():
             raise ValidationError({'detail': 'This video is already in the watch later list.'},code=401)
@@ -60,6 +66,7 @@ class WatchLaterDeleteAPIView(generics.DestroyAPIView):
     queryset = WatchLater.objects.all()
     serializer_class = WatchLaterSerializer
     permission_classes = [IsAuthenticated]  # Add appropriate permissions
+    authentication_classes=([CustomAuthentication])
 
     def destroy(self, request, *args, **kwargs):
         user = self.request.user
@@ -77,6 +84,7 @@ class WatchLaterDeleteAPIView(generics.DestroyAPIView):
 class LikedListByUserAPIView(generics.ListAPIView):
     serializer_class = VideoSerializer
     permission_classes = [IsAuthenticated]
+    authentication_classes=([CustomAuthentication])
 
     def get_queryset(self):
         user = self.request.user
@@ -92,6 +100,7 @@ class LikedListByUserAPIView(generics.ListAPIView):
 class LikedCreateAPIView(generics.CreateAPIView):
     serializer_class = LikedVideoSerializer
     permission_classes = [IsAuthenticated]  # Add appropriate permissions
+    authentication_classes=([CustomAuthentication])
 
     def perform_create(self, serializer):
         
@@ -108,6 +117,7 @@ class LikedDeleteAPIView(generics.DestroyAPIView):
     queryset = LikedVideo.objects.all()
     serializer_class = LikedVideoSerializer
     permission_classes = [IsAuthenticated]  # Add appropriate permissions
+    authentication_classes=([CustomAuthentication])
 
     def destroy(self, request, *args, **kwargs):
         user = self.request.user
@@ -126,6 +136,7 @@ class LikedDeleteAPIView(generics.DestroyAPIView):
 class HistoryListByUserAPIView(generics.ListAPIView):
     serializer_class = VideoSerializer
     permission_classes = [IsAuthenticated]
+    authentication_classes=([CustomAuthentication])
 
     def get_queryset(self):
         user = self.request.user
@@ -141,6 +152,7 @@ class HistoryListByUserAPIView(generics.ListAPIView):
 class HistoryCreateAPIView(generics.CreateAPIView):
     serializer_class = HistorySerializer
     permission_classes = [IsAuthenticated]  # Add appropriate permissions
+    authentication_classes=([CustomAuthentication])
 
     def perform_create(self, serializer):
         
@@ -157,6 +169,7 @@ class HistoryDeleteAPIView(generics.DestroyAPIView):
     queryset = History.objects.all()
     serializer_class = HistorySerializer
     permission_classes = [IsAuthenticated]  # Add appropriate permissions
+    authentication_classes=([CustomAuthentication])
 
     def destroy(self, request, *args, **kwargs):
         user = self.request.user
@@ -175,6 +188,7 @@ class HistoryDeleteAPIView(generics.DestroyAPIView):
 class HistoryClearByUserAPIView(generics.DestroyAPIView):
     serializer_class = HistorySerializer
     permission_classes = [IsAuthenticated]
+    authentication_classes=([CustomAuthentication])
 
     def destroy(self, request, *args, **kwargs):
         user = self.request.user
@@ -187,6 +201,8 @@ class HistoryClearByUserAPIView(generics.DestroyAPIView):
     
 #Playliust handler 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([CustomAuthentication])
 def playlist_list_by_user(request):
     if not request.user.is_authenticated:
         return Response({'detail': 'Authentication required.'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -203,6 +219,7 @@ def playlist_list_by_user(request):
 class PlaylistCreateAPIView(generics.CreateAPIView):
     serializer_class = PlaylistSerializer
     permission_classes = [IsAuthenticated]
+    authentication_classes=([CustomAuthentication])
 
     def perform_create(self, serializer):
         # Set the user of the playlist to the authenticated user
@@ -213,6 +230,7 @@ class PlaylistDeleteAPIView(generics.DestroyAPIView):
     queryset = Playlist.objects.all()
     serializer_class = PlaylistSerializer
     permission_classes = [IsAuthenticated]
+    authentication_classes=([CustomAuthentication])
 
     def get_object(self):
         user = self.request.user
@@ -232,6 +250,8 @@ class PlaylistDeleteAPIView(generics.DestroyAPIView):
     
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+@authentication_classes([CustomAuthentication])
+
 def playlist_videos(request, playlist_id):
     try:
         playlist = Playlist.objects.get(id=playlist_id)
@@ -248,6 +268,7 @@ def playlist_videos(request, playlist_id):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+@authentication_classes([CustomAuthentication])
 def add_video_to_playlist(request, playlist_id, video_id):
     try:
         playlist = Playlist.objects.get(id=playlist_id)
@@ -270,6 +291,7 @@ def add_video_to_playlist(request, playlist_id, video_id):
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
+@authentication_classes([CustomAuthentication])
 def remove_video_from_playlist(request, playlist_id, video_id):
     try:
         playlist = Playlist.objects.get(id=playlist_id)
@@ -293,6 +315,7 @@ def remove_video_from_playlist(request, playlist_id, video_id):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+@authentication_classes([CustomAuthentication])
 def video_presence_in_playlists(request, video_id):
     try:
         # Get the video by ID
@@ -308,8 +331,72 @@ def video_presence_in_playlists(request, video_id):
         is_video_present = playlist.videos.filter(id=video_id).exists()
         playlist_info = {
             'playlist_name': playlist.title,
+            'id':playlist.id,
             'is_video_present': is_video_present,
         }
         playlist_data.append(playlist_info)
 
     return Response(playlist_data, status=status.HTTP_200_OK)
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([CustomAuthentication])
+def is_video_liked(request, video_id):
+    try:
+        video = Video.objects.get(id=video_id)
+    except Video.DoesNotExist:
+        return Response({'detail': 'Video not found.'}, status=404)
+
+    user = request.user
+    is_liked = LikedVideo.objects.filter(user=user, video=video).exists()
+
+    return Response({'is_liked': is_liked}, status=200)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@authentication_classes([CustomAuthentication])
+
+def is_video_in_watch_later(request, video_id):
+    try:
+        video = Video.objects.get(id=video_id)
+    except Video.DoesNotExist:
+        return Response({'detail': 'Video not found.'}, status=404)
+
+    user = request.user
+    is_in_watch_later = WatchLater.objects.filter(user=user, video=video).exists()
+
+    return Response({'is_in_watch_later': is_in_watch_later}, status=200)
+
+
+
+
+class CommentListCreateView(generics.ListCreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class CommentDetailView(generics.DestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+@api_view(['GET'])
+def nested_comments_by_video(request, video_id):
+    top_level_comments = Comment.objects.filter(video_id=video_id, parent_comment=None)
+    serialized_comments = CommentSerializer(top_level_comments, many=True).data
+
+    for comment in serialized_comments:
+        comment['replies'] = CommentSerializer(
+            Comment.objects.filter(parent_comment_id=comment['id']),
+            many=True
+        ).data
+
+    return Response(serialized_comments)

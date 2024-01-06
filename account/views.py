@@ -14,9 +14,12 @@ from rest_framework_simplejwt.exceptions import InvalidToken
 from django.middleware import csrf
 from rest_framework_simplejwt import tokens
 from rest_framework import response,exceptions
+from django.views.decorators.csrf import csrf_exempt
+from .authenticate import CustomAuthentication
 # Create your views here.
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+@authentication_classes([CustomAuthentication])
 def hello_world(request):
     return Response({"message": "Hello, world!"})
 
@@ -113,21 +116,25 @@ class CookieTokenRefreshView(TokenRefreshView):
 
         return super().finalize_response(request, response, *args, **kwargs)
 
+@csrf_exempt
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
 def logoutView(request):
     try:
+        print(request.user.is_anonymous)
+        
         refreshToken = request.COOKIES.get(
             settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'])
         token = tokens.RefreshToken(refreshToken)
         token.blacklist()
 
         res = response.Response()
+       
         res.delete_cookie(settings.SIMPLE_JWT['AUTH_COOKIE'])
         res.delete_cookie(settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'])
         res.delete_cookie("X-CSRFToken")
         res.delete_cookie("csrftoken")
-        res["X-CSRFToken"]=None
+        print(res.cookies)
+       
         
         return res
     except:
