@@ -31,4 +31,8 @@ urlpatterns = [
     path('liked/check/<int:video_id>/', views.is_video_liked, name='video-presence-in-like'),
     path('watchlater/check/<int:video_id>/', views.is_video_in_watch_later, name='video-presence-in-watchlater'),
 
+
+    path('comments/', views.CommentListCreateView.as_view(), name='comment-list-create'),
+    path('comments/<int:pk>/', views.CommentDeleteView.as_view(), name='comment-detail'),
+    path('comments/video/<int:video_id>/', views.nested_comments_by_video, name='nested-comments-by-video'),
 ]

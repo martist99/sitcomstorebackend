@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import Video,WatchLater,LikedVideo,History,Playlist,Comment
+from account.models import User
+from account.serializer import UserSerializer
 class VideoSerializer(serializers.ModelSerializer):
     class Meta:
         model=Video

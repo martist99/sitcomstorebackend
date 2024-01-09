@@ -61,7 +61,6 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         )
         user=User.objects.filter(email=request.data.get('email')).first()
         response.data=UserSerializer(user).data
-        print(response.cookies,"popopo")
         
         return response
 
@@ -120,8 +119,6 @@ class CookieTokenRefreshView(TokenRefreshView):
 @api_view(['POST'])
 def logoutView(request):
     try:
-        print(request.user.is_anonymous)
-        
         refreshToken = request.COOKIES.get(
             settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'])
         token = tokens.RefreshToken(refreshToken)
@@ -133,7 +130,6 @@ def logoutView(request):
         res.delete_cookie(settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'])
         res.delete_cookie("X-CSRFToken")
         res.delete_cookie("csrftoken")
-        print(res.cookies)
        
         
         return res

@@ -9,7 +9,8 @@ from rest_framework.exceptions import ValidationError
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from account.authenticate import CustomAuthentication
-
+from account.models import User
+from account.serializer import UserSerializer
 # Create your views here.
 
 from django.shortcuts import get_object_or_404
@@ -378,24 +379,41 @@ class CommentListCreateView(generics.ListCreateAPIView):
     serializer_class = CommentSerializer
 
     def post(self, request, *args, **kwargs):
+        video_id = request.data.get('video', None)
+        parent_comment_id = request.data.get('parent_comment', None)
+
+        # Check if the parent comment belongs to the same video
+        if parent_comment_id:
+            parent_comment = Comment.objects.filter(id=parent_comment_id, video_id=video_id)
+
+            if not parent_comment.exists():
+                return Response({"error": "Parent comment does not belong to the same video."},
+                                status=status.HTTP_400_BAD_REQUEST)
+
         serializer = CommentSerializer(data=request.data)
+        
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class CommentDetailView(generics.DestroyAPIView):
+class CommentDeleteView(generics.DestroyAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
 @api_view(['GET'])
 def nested_comments_by_video(request, video_id):
-    top_level_comments = Comment.objects.filter(video_id=video_id, parent_comment=None)
+    top_level_comments = Comment.objects.filter(video_id=video_id, parent_comment=None).order_by('-created_at')
     serialized_comments = CommentSerializer(top_level_comments, many=True).data
-
+    
     for comment in serialized_comments:
+        user_id= comment['user']   # Assuming user_id is present in the serialized data
+        user_data = User.objects.get(id=user_id)  # Replace YourUserModel with your actual user model
+        user_serializer = UserSerializer(user_data)  # Replace YourUserSerializer with your actual user serializer
+        comment['user'] = user_serializer.data
         comment['replies'] = CommentSerializer(
-            Comment.objects.filter(parent_comment_id=comment['id']),
+            Comment.objects.filter(parent_comment_id=comment['id']).order_by('-created_at'),
             many=True
         ).data
 

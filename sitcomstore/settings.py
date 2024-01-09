@@ -15,12 +15,16 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+import environ
+import os
+env = environ.Env()
+env_path = os.path.join(BASE_DIR, '.env')
+environ.Env.read_env(env_file=env_path)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-fd+2i!%i)t&u@4jo=(6&cdddvrmc*ol#2yy%&it_1*&7*&h47*'
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -44,6 +48,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'django_filters',
+
 
 ]
 
@@ -83,12 +88,30 @@ WSGI_APPLICATION = 'sitcomstore.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 DATABASES = {
+
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+
+        'ENGINE': 'django.db.backends.postgresql',
+
+        'NAME':os.environ.get("DB_NAME"),
+
+        'USER':os.environ.get("DB_USER"),
+
+        'PASSWORD':os.environ.get("DB_PASSWORD"),
+
+        'HOST': os.environ.get("DB_HOST"),
+
+        'PORT': '5432',
     }
 }
+
 
 
 # Password validation
@@ -137,12 +160,16 @@ AUTH_USER_MODEL = 'account.User'
 CORS_ALLOWED_ORIGINS = [ 
     
    'http://localhost:5173',
+   os.environ.get("CLIENT_ORIGIN")
+
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173"
+    "http://localhost:5173",
+    os.environ.get("CLIENT_ORIGIN")
+
 ]
 CORS_EXPOSE_HEADERS = ["Content-Type", "X-CSRFToken"]
 SESSION_COOKIE_SECURE = True
@@ -192,3 +219,4 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 
 }
+
