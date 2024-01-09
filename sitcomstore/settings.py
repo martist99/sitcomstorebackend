@@ -173,8 +173,8 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 CORS_EXPOSE_HEADERS = ["Content-Type", "X-CSRFToken"]
 SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SAMESITE = False
-SESSION_COOKIE_SAMESITE = False
+CSRF_COOKIE_SAMESITE = None
+SESSION_COOKIE_SAMESITE = None
 SESSION_COOKIE_DOMAIN=None
 CSRF_COOKIE_PATH = '/'
 CSRF_COOKIE_SECURE = True 
@@ -208,7 +208,7 @@ SIMPLE_JWT = {
     "AUTH_COOKIE_SECURE": False,  # restricts the transmission of the cookie to only occur over secure (HTTPS) connections. 
     "AUTH_COOKIE_HTTP_ONLY": True,  # prevents client-side js from accessing the cookie
     "AUTH_COOKIE_PATH": "/",  # URL path where cookie will be sent
-    "AUTH_COOKIE_SAMESITE": False,
+    "AUTH_COOKIE_SAMESITE": None,
 }
 
 REST_FRAMEWORK = {
