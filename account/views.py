@@ -36,9 +36,9 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             domain=settings.SIMPLE_JWT["AUTH_COOKIE_DOMAIN"],
             path=settings.SIMPLE_JWT["AUTH_COOKIE_PATH"],
             expires=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
-            secure=True,
             httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
             samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
+            secure=True,
         )
         refresh_token = response.data["refresh"]
         response.data.pop("refresh")
@@ -46,9 +46,9 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             key=settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'],
             value=refresh_token,
             expires=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'],
-            secure=True,
             httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
-            samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
+            samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE'],
+            secure=True,
         )
         
         response.set_cookie(
