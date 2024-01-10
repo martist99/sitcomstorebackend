@@ -36,7 +36,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             domain=settings.SIMPLE_JWT["AUTH_COOKIE_DOMAIN"],
             path=settings.SIMPLE_JWT["AUTH_COOKIE_PATH"],
             expires=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
-            secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
+            secure=True,
             httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
             samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
         )
@@ -46,7 +46,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             key=settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'],
             value=refresh_token,
             expires=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'],
-            secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+            secure=True,
             httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
             samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
         )
@@ -56,7 +56,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             value= csrf.get_token(request),
             httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
             samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE'],
-            secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+            secure=True,
 
         )
         user=User.objects.filter(email=request.data.get('email')).first()

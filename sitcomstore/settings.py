@@ -210,10 +210,10 @@ SIMPLE_JWT = {
     'AUTH_COOKIE_REFRESH': 'refresh_token',
 
     "AUTH_COOKIE_DOMAIN": None,  # specifies domain for which the cookie will be sent
-    "AUTH_COOKIE_SECURE": False,  # restricts the transmission of the cookie to only occur over secure (HTTPS) connections. 
+    "AUTH_COOKIE_SECURE": True,  # restricts the transmission of the cookie to only occur over secure (HTTPS) connections. 
     "AUTH_COOKIE_HTTP_ONLY": False,  # prevents client-side js from accessing the cookie
     "AUTH_COOKIE_PATH": "/",  # URL path where cookie will be sent
-    "AUTH_COOKIE_SAMESITE": 'None',
+    "AUTH_COOKIE_SAMESITE": None,
 }
 
 REST_FRAMEWORK = {
