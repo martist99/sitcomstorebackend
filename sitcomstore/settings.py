@@ -172,15 +172,19 @@ CSRF_TRUSTED_ORIGINS = [
 
 ]
 CORS_EXPOSE_HEADERS = ["Content-Type", "X-CSRFToken"]
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SAMESITE = None
-SESSION_COOKIE_SAMESITE = None
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_DOMAIN=None
 CSRF_COOKIE_PATH = '/'
-CSRF_COOKIE_SECURE = True 
+CSRF_COOKIE_SECURE = False 
 SESSION_COOKIE_PATH = '/;HttpOnly'
 CSRF_COOKIE_HTTPONLY=True
-SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_HTTPONLY = False
+CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ALLOW_CREDENTIALS = True
+
 
 from datetime  import timedelta
 
@@ -206,9 +210,9 @@ SIMPLE_JWT = {
 
     "AUTH_COOKIE_DOMAIN": None,  # specifies domain for which the cookie will be sent
     "AUTH_COOKIE_SECURE": False,  # restricts the transmission of the cookie to only occur over secure (HTTPS) connections. 
-    "AUTH_COOKIE_HTTP_ONLY": True,  # prevents client-side js from accessing the cookie
+    "AUTH_COOKIE_HTTP_ONLY": False,  # prevents client-side js from accessing the cookie
     "AUTH_COOKIE_PATH": "/",  # URL path where cookie will be sent
-    "AUTH_COOKIE_SAMESITE": None,
+    "AUTH_COOKIE_SAMESITE": 'None',
 }
 
 REST_FRAMEWORK = {
