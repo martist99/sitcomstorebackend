@@ -37,7 +37,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             path=settings.SIMPLE_JWT["AUTH_COOKIE_PATH"],
             expires=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
             httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
-            samesite=None,
+            samesite='None',
             secure=True,
         )
         refresh_token = response.data["refresh"]
@@ -55,7 +55,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             key='X-CSRFToken' ,
             value= csrf.get_token(request),
             httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
-            samesite=None,
+            samesite='None',
             secure=True,
 
         )
