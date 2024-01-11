@@ -88,9 +88,9 @@ class CookieTokenRefreshView(TokenRefreshView):
                 key=settings.SIMPLE_JWT['AUTH_COOKIE_REFRESH'],
                 value=response.data['refresh'],
                 expires=settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'],
-                secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
                 httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
-                samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
+                samesite='None',
+                secure=True,
             )
             access_token = response.data["access"]
             response.set_cookie(
@@ -99,16 +99,18 @@ class CookieTokenRefreshView(TokenRefreshView):
             domain=settings.SIMPLE_JWT["AUTH_COOKIE_DOMAIN"],
             path=settings.SIMPLE_JWT["AUTH_COOKIE_PATH"],
             expires=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
-            secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
             httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
-            samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"],
+            samesite='None',
+            secure=True,
         )
             response.set_cookie(
             key='X-CSRFToken' ,
             value= csrf.get_token(request),
             httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
-            samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE'],
-            secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],)
+            samesite='None',
+            secure=True,
+            
+            )
 
             del response.data["refresh"]
             del response.data["access"]
