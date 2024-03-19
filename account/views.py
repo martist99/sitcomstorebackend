@@ -18,8 +18,6 @@ from django.views.decorators.csrf import csrf_exempt
 from .authenticate import CustomAuthentication
 # Create your views here.
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
-@authentication_classes([CustomAuthentication])
 def hello_world(request):
     return Response({"message": "Hello, world!"})
 
